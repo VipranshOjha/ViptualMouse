@@ -11,8 +11,8 @@ drawing_utils = mp.solutions.drawing_utils
 
 screen_width, screen_height = pyautogui.size()
 
-thumb_index_distance_threshold = 50
-thumb_pinky_distance_threshold = 50
+thumb_index_distance_threshold = 80
+thumb_pinky_distance_threshold = 80
 
 while True:
     _, frame = cap.read()
@@ -25,10 +25,11 @@ while True:
 
     rgb_frame_face = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
     output_face = face_mesh.process(rgb_frame_face)
-    landmark_points = output_face.multiz_face
+    landmark_points = output_face.multi_face_landmarks
 
     thumb_x, thumb_y, thumb_tip_x, thumb_tip_y = 0, 0, 0, 0
-    index_x, index_y, pinky_x, pinky_y = 0, 0, 0, 0
+    index_x, index_y, index_tip_x, index_tip_y = 0, 0, 0, 0
+    pinky_x, pinky_y, pinky_tip_x, pinky_tip_y = 0, 0, 0, 0
 
     if hands:
         for hand in hands:
@@ -37,25 +38,27 @@ while True:
             for id, landmark in enumerate(landmarks):
                 x = int(landmark.x * frame_width)
                 y = int(landmark.y * frame_height)
-                if id == 8:
-                    cv2.circle(img=frame, center=(x, y), radius=10, color=(0, 255, 255))
-                    index_x = screen_width / frame_width * x
-                    index_y = screen_height / frame_height * y
 
                 if id == 4:
                     cv2.circle(img=frame, center=(x, y), radius=10, color=(0, 255, 255))
                     thumb_x = screen_width / frame_width * x
                     thumb_y = screen_height / frame_height * y
+                    thumb_tip_x = thumb_x
+                    thumb_tip_y = thumb_y
+
+                if id == 8:
+                    cv2.circle(img=frame, center=(x, y), radius=10, color=(0, 255, 255))
+                    index_x = screen_width / frame_width * x
+                    index_y = screen_height / frame_height * y
+                    index_tip_x = index_x
+                    index_tip_y = index_y
 
                 if id == 20:
                     cv2.circle(img=frame, center=(x, y), radius=10, color=(0, 255, 255))
                     pinky_x = screen_width / frame_width * x
                     pinky_y = screen_height / frame_height * y
-
-                # if id == 5:  # Thumb tip
-                #     cv2.circle(img=frame, center=(x, y), radius=10, color=(0, 255, 255))
-                #     thumb_tip_x = screen_width / frame_width * x
-                #     thumb_tip_y = screen_height / frame_height * y
+                    pinky_tip_x = pinky_x
+                    pinky_tip_y = pinky_y
 
     thumb_index_distance = ((thumb_x - index_x) ** 2 + (thumb_y - index_y) ** 2) ** 0.5
     thumb_pinky_distance = ((thumb_x - pinky_x) ** 2 + (thumb_y - pinky_y) ** 2) ** 0.5
