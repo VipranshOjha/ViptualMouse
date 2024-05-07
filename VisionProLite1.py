@@ -11,8 +11,7 @@ drawing_utils = mp.solutions.drawing_utils
 
 screen_width, screen_height = pyautogui.size()
 
-thumb_index_distance_threshold = 80
-thumb_pinky_distance_threshold = 80
+index_x, index_y = 0, 0
 
 while True:
     _, frame = cap.read()
@@ -27,9 +26,6 @@ while True:
     output_face = face_mesh.process(rgb_frame_face)
     landmark_points = output_face.multi_face_landmarks
 
-    thumb_x, thumb_y, thumb_tip_x, thumb_tip_y = 0, 0, 0, 0
-    index_x, index_y, pinky_x, pinky_y = 0, 0, 0, 0
-
     if hands:
         for hand in hands:
             drawing_utils.draw_landmarks(frame, hand)
@@ -37,7 +33,6 @@ while True:
             for id, landmark in enumerate(landmarks):
                 x = int(landmark.x * frame_width)
                 y = int(landmark.y * frame_height)
-
                 if id == 8:
                     cv2.circle(img=frame, center=(x, y), radius=10, color=(0, 255, 255))
                     index_x = screen_width / frame_width * x
@@ -47,22 +42,10 @@ while True:
                     cv2.circle(img=frame, center=(x, y), radius=10, color=(0, 255, 255))
                     thumb_x = screen_width / frame_width * x
                     thumb_y = screen_height / frame_height * y
+                    if abs(index_y - thumb_y) < 50:
+                        pyautogui.click()
+                        pyautogui.sleep(1)
 
-                if id == 20:
-                    cv2.circle(img=frame, center=(x, y), radius=10, color=(0, 255, 255))
-                    pinky_x = screen_width / frame_width * x
-                    pinky_y = screen_height / frame_height * y
-
-    thumb_index_distance = ((thumb_x - index_x) ** 2 + (thumb_y - index_y) ** 2) ** 0.5
-    thumb_pinky_distance = ((thumb_x - pinky_x) ** 2 + (thumb_y - pinky_y) ** 2) ** 0.5
-
-    if thumb_index_distance < thumb_index_distance_threshold:
-        pyautogui.click(button='left')
-        pyautogui.sleep(1)
-
-    if thumb_pinky_distance < thumb_pinky_distance_threshold:
-        pyautogui.click(button='right')
-        pyautogui.sleep(1)
 
     if landmark_points:
         landmarks = landmark_points[0].landmark
@@ -74,6 +57,16 @@ while True:
                 screen_x = screen_width * landmark.x
                 screen_y = screen_height * landmark.y
                 pyautogui.moveTo(screen_x, screen_y)
+
+        left = [landmarks[145], landmarks[159]]
+        for landmark in left:
+            x = int(landmark.x * frame_width)
+            y = int(landmark.y * frame_height)
+            cv2.circle(frame, (x, y), 3, (0, 255, 255))
+
+        if (left[0].y - left[1].y) < 0.004:
+            pyautogui.click()
+            pyautogui.sleep(1)
 
     cv2.imshow('Vision Pro Lite :)', frame)
 

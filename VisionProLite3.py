@@ -4,7 +4,7 @@ import pyautogui
 
 cap = cv2.VideoCapture(0)
 
-hand_detector = mp.solutions.hands.Hands()
+hand_detector = mp.solutions.hands.Hands(max_num_hands=1)
 face_mesh = mp.solutions.face_mesh.FaceMesh(refine_landmarks=True)
 
 drawing_utils = mp.solutions.drawing_utils
@@ -28,7 +28,8 @@ while True:
     landmark_points = output_face.multi_face_landmarks
 
     thumb_x, thumb_y, thumb_tip_x, thumb_tip_y = 0, 0, 0, 0
-    index_x, index_y, pinky_x, pinky_y = 0, 0, 0, 0
+    index_x, index_y, index_tip_x, index_tip_y = 0, 0, 0, 0
+    pinky_x, pinky_y, pinky_tip_x, pinky_tip_y = 0, 0, 0, 0
 
     if hands:
         for hand in hands:
@@ -38,20 +39,26 @@ while True:
                 x = int(landmark.x * frame_width)
                 y = int(landmark.y * frame_height)
 
-                if id == 8:
-                    cv2.circle(img=frame, center=(x, y), radius=10, color=(0, 255, 255))
-                    index_x = screen_width / frame_width * x
-                    index_y = screen_height / frame_height * y
-
                 if id == 4:
                     cv2.circle(img=frame, center=(x, y), radius=10, color=(0, 255, 255))
                     thumb_x = screen_width / frame_width * x
                     thumb_y = screen_height / frame_height * y
+                    thumb_tip_x = thumb_x
+                    thumb_tip_y = thumb_y
+
+                if id == 8:
+                    cv2.circle(img=frame, center=(x, y), radius=10, color=(0, 255, 255))
+                    index_x = screen_width / frame_width * x
+                    index_y = screen_height / frame_height * y
+                    index_tip_x = index_x
+                    index_tip_y = index_y
 
                 if id == 20:
                     cv2.circle(img=frame, center=(x, y), radius=10, color=(0, 255, 255))
                     pinky_x = screen_width / frame_width * x
                     pinky_y = screen_height / frame_height * y
+                    pinky_tip_x = pinky_x
+                    pinky_tip_y = pinky_y
 
     thumb_index_distance = ((thumb_x - index_x) ** 2 + (thumb_y - index_y) ** 2) ** 0.5
     thumb_pinky_distance = ((thumb_x - pinky_x) ** 2 + (thumb_y - pinky_y) ** 2) ** 0.5
