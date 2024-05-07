@@ -24,7 +24,7 @@ This project demonstrates real-time hand gesture control using OpenCV and MediaP
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/yourusername/your-repository.git
+git clone https://github.com/VipranshOjha/your-repository.git
 ```
 
 2. Install dependencies:
@@ -59,10 +59,6 @@ python hand_gesture_control.py
 ## Contributions
 
 Contributions are welcome! Feel free to open issues or pull requests for bug fixes, improvements, or new features.
-
-## License
-
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
 ## Acknowledgments
 
